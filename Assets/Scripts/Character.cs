@@ -1,10 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Character : MonoBehaviour {
 
+    private Boolean onAir;
+    AudioSource newAudio;
+    Animator anim;
     Rigidbody2D rb2d;
     SpriteRenderer sr;
     public Camera cam;
@@ -14,6 +18,8 @@ public class Character : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        newAudio = GetComponent<AudioSource>();
+        anim = GetComponent<Animator>();
         rb2d = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         cam.transform.position = new Vector3(rb2d.transform.position.x, cam.transform.position.y, cam.transform.position.z);
@@ -31,8 +37,20 @@ public class Character : MonoBehaviour {
         sr.flipX = !facingRight;
 
         if (Input.GetButtonDown("Jump")) {
-            rb2d.AddForce(Vector2.up*jumpForce);
+            if (onAir == false)
+            {
+                onAir = true;
+                newAudio.Play();
+                rb2d.AddForce(Vector2.up * jumpForce);
+            }
         }
 
-	}
+        anim.SetFloat("Speed", Mathf.Abs(move));
+
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        onAir = false;
+    }
 }
